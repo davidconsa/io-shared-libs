@@ -1,0 +1,12 @@
+{
+  "name": "@io-shared/shared-configs",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared ESLint, TypeScript, and Jest configurations",
+  "exports": {
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/jest": "./tsconfig/jest.json",
+    "./eslint": "./eslint/index.cjs",
+    "./jest": "./jest/jest.base.config.cjs"
+  }
+}

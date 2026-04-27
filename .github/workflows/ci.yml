@@ -1,0 +1,207 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+# TBD: cancel in-progress runs on the same PR branch to avoid wasted runners
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.33.0'
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  # ── Quality gates (parallel) ──────────────────────────────────────────────
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-lint-${{ runner.os }}-
+
+      - name: Lint
+        run: pnpm turbo lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-typecheck-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-typecheck-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-typecheck-${{ runner.os }}-
+
+      - name: Typecheck
+        run: pnpm turbo typecheck
+
+  # ── Tests + Coverage enforcement ──────────────────────────────────────────
+
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore Turborepo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-test-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-test-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-test-${{ runner.os }}-
+
+      - name: Build
+        run: pnpm turbo build
+
+      # coverageThreshold (100%) is enforced inside jest.config.ts — if coverage
+      # drops below threshold Jest exits with code 1 and this step fails.
+      - name: Test with coverage
+        run: pnpm turbo test
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.run_id }}
+          path: packages/*/coverage/
+          retention-days: 7
+
+      - name: Coverage comment on PR
+        if: github.event_name == 'pull_request'
+        uses: MishaKav/jest-coverage-comment@v1.0.26
+        with:
+          coverage-summary-path: packages/http-client/coverage/coverage-summary.json
+          title: Coverage — @io-shared/http-client
+          badge-title: Coverage
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Security ──────────────────────────────────────────────────────────────
+
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit (high + critical only)
+        run: pnpm audit --audit-level=high
+
+  # Diff-based review: flags new deps with known CVEs introduced in this PR
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+  # ── All-green gate ────────────────────────────────────────────────────────
+  # This is the single required check configured in branch protection rules.
+  # Any new job added above must also be listed in `needs` here.
+
+  ci:
+    name: CI ✓
+    if: always()
+    needs: [lint, typecheck, test, audit]
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Verify all jobs passed
+        env:
+          LINT: ${{ needs.lint.result }}
+          TYPECHECK: ${{ needs.typecheck.result }}
+          TEST: ${{ needs.test.result }}
+          AUDIT: ${{ needs.audit.result }}
+        run: |
+          for job in LINT TYPECHECK TEST AUDIT; do
+            result="${!job}"
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "❌ $job: $result"
+              exit 1
+            fi
+          done
+          echo "✅ All checks passed."

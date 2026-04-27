@@ -133,7 +133,7 @@ jobs:
 
       - name: Coverage comment on PR
         if: github.event_name == 'pull_request'
-        uses: MishaKav/jest-coverage-comment@v1.0.26
+        uses: MishaKav/jest-coverage-comment@v1.0.33
         with:
           coverage-summary-path: packages/http-client/coverage/coverage-summary.json
           title: Coverage — @io-shared/http-client

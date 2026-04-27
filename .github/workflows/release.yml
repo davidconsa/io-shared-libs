@@ -18,7 +18,7 @@ jobs:
     name: Release
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Full history so changesets can diff versions across commits.
           # NOTE: use a PAT (repo + workflow scopes) instead of GITHUB_TOKEN

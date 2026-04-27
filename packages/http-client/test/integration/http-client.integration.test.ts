@@ -3,9 +3,13 @@ import { HttpError } from '../../src/errors/http.error';
 import { CORRELATION_ID_HEADER } from '../../src/interceptors/correlation-id.interceptor';
 import { buildJsonResponse } from '../fixtures/mock-data';
 
-const fetchSpy = jest.spyOn(globalThis, 'fetch');
-
 describe('HttpClient integration', () => {
+  let fetchSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    fetchSpy = jest.spyOn(globalThis, 'fetch');
+  });
+
   afterEach(() => {
     fetchSpy.mockReset();
   });
@@ -27,7 +31,7 @@ describe('HttpClient integration', () => {
     });
 
     it('should inject a different correlation ID per request', async () => {
-      fetchSpy.mockResolvedValue(buildJsonResponse({}));
+      fetchSpy.mockImplementation(() => Promise.resolve(buildJsonResponse({})));
 
       const client = createHttpClient();
       await client.get('https://api.example.com/a');
@@ -43,19 +47,15 @@ describe('HttpClient integration', () => {
 
   describe('retry on 5xx', () => {
     it('should retry and eventually throw HttpError after exhausting attempts', async () => {
-      jest.useFakeTimers();
-      fetchSpy.mockResolvedValue(
-        buildJsonResponse({ error: 'unavailable' }, 503),
+      fetchSpy.mockImplementation(() =>
+        Promise.resolve(buildJsonResponse({ error: 'unavailable' }, 503)),
       );
 
-      const client = createHttpClient({ maxRetries: 2, baseDelayMs: 10 });
-      const promise = client.get('https://api.example.com/data');
-      await jest.runAllTimersAsync();
+      const client = createHttpClient({ maxRetries: 2, baseDelayMs: 0, maxDelayMs: 0 });
 
-      await expect(promise).rejects.toBeInstanceOf(HttpError);
+      await expect(client.get('https://api.example.com/data')).rejects.toBeInstanceOf(HttpError);
       // 1 initial + 2 retries = 3 calls
       expect(fetchSpy).toHaveBeenCalledTimes(3);
-      jest.useRealTimers();
     });
   });
 

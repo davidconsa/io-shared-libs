@@ -8,7 +8,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "jest.config.ts", "tsconfig.jest.json"],
+      "inputs": ["src/**", "test/**", "jest.config.cjs", "tsconfig.jest.json"],
       "outputs": ["coverage/**"]
     },
     "typecheck": {

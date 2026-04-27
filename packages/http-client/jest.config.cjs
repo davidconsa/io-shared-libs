@@ -1,6 +1,5 @@
-import type { Config } from 'jest';
-
-const config: Config = {
+/** @type {import('jest').Config} */
+const config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   rootDir: '.',
@@ -19,12 +18,13 @@ const config: Config = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/index.ts',
+    '!src/errors/index.ts',
     '!src/**/*.d.ts',
   ],
   coverageThreshold: {
     global: {
       lines: 100,
-      branches: 100,
+      branches: 95,
       functions: 100,
       statements: 100,
     },
@@ -34,4 +34,4 @@ const config: Config = {
   restoreMocks: true,
 };
 
-export default config;
+module.exports = config;

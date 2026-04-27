@@ -1,0 +1,10 @@
+# Default owner for everything
+* @cbdavid14
+
+# CI/CD and security configs require explicit review
+/.github/ @cbdavid14
+
+# Core packages
+/packages/http-client/ @cbdavid14
+/packages/logger/      @cbdavid14
+/packages/shared-configs/ @cbdavid14

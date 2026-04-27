@@ -1,0 +1,26 @@
+{
+  "name": "io-shared-libs",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Internal company SDK monorepo",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "version-packages": "changeset version",
+    "publish-packages": "turbo build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.27.12",
+    "@types/node": "20.17.14",
+    "turbo": "2.3.3",
+    "typescript": "6.0.3"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

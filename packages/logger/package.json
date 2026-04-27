@@ -1,5 +1,5 @@
 {
-  "name": "@io-shared/logger",
+  "name": "@iomvpdev/logger",
   "version": "0.1.0",
   "type": "module",
   "description": "ILogger interface stub for structured logging",
@@ -20,6 +20,11 @@
   "types": "./dist/index.d.ts",
   "files": ["dist"],
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IOMVPDEV/io-shared-libs.git",
+    "directory": "packages/logger"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
@@ -30,7 +35,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@io-shared/shared-configs": "workspace:*",
+    "@iomvpdev/shared-configs": "workspace:*",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3"
   }

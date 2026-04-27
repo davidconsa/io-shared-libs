@@ -23,7 +23,7 @@ importers:
 
   packages/http-client:
     devDependencies:
-      '@io-shared/shared-configs':
+      '@iomvpdev/shared-configs':
         specifier: workspace:*
         version: link:../shared-configs
       '@types/jest':
@@ -56,7 +56,7 @@ importers:
 
   packages/logger:
     devDependencies:
-      '@io-shared/shared-configs':
+      '@iomvpdev/shared-configs':
         specifier: workspace:*
         version: link:../shared-configs
       tsup:

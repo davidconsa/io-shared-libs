@@ -34,9 +34,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-          # Points npm publish commands to GitHub Packages for @io-shared
+          # Points npm publish commands to GitHub Packages for @iomvpdev
           registry-url: https://npm.pkg.github.com
-          scope: '@io-shared'
+          scope: '@iomvpdev'
 
       - name: Install
         run: pnpm install --frozen-lockfile

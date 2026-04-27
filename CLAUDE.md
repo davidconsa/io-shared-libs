@@ -14,9 +14,9 @@ Internal company SDK monorepo. Single source of truth for shared libraries used 
 
 | Package | Purpose |
 |---|---|
-| `@io-shared/http-client` | Native fetch wrapper — Priority 1 |
-| `@io-shared/logger` | ILogger interface stub |
-| `@io-shared/shared-configs` | Shared tsconfig, eslint, jest base |
+| `@iomvpdev/http-client` | Native fetch wrapper — Priority 1 |
+| `@iomvpdev/logger` | ILogger interface stub |
+| `@iomvpdev/shared-configs` | Shared tsconfig, eslint, jest base |
 
 ## Commands
 
@@ -29,8 +29,8 @@ pnpm turbo lint               # Lint all packages
 pnpm turbo clean              # Remove dist/ and coverage/
 
 # Per-package (from repo root)
-pnpm --filter @io-shared/http-client build
-pnpm --filter @io-shared/http-client test
+pnpm --filter @iomvpdev/http-client build
+pnpm --filter @iomvpdev/http-client test
 ```
 
 ## Architecture: http-client

@@ -136,7 +136,7 @@ jobs:
         uses: MishaKav/jest-coverage-comment@v1.0.26
         with:
           coverage-summary-path: packages/http-client/coverage/coverage-summary.json
-          title: Coverage — @io-shared/http-client
+          title: Coverage — @iomvpdev/http-client
           badge-title: Coverage
           github-token: ${{ secrets.GITHUB_TOKEN }}
 

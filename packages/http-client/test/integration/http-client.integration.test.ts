@@ -21,8 +21,8 @@ describe('HttpClient integration', () => {
       const client = createHttpClient();
       await client.get('https://api.example.com/health');
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      const headers = init?.headers as Record<string, string>;
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      const headers = init.headers as Record<string, string>;
 
       expect(headers[CORRELATION_ID_HEADER]).toBeDefined();
       expect(headers[CORRELATION_ID_HEADER]).toMatch(
@@ -37,9 +37,9 @@ describe('HttpClient integration', () => {
       await client.get('https://api.example.com/a');
       await client.get('https://api.example.com/b');
 
-      const calls = fetchSpy.mock.calls as [string, RequestInit][];
-      const id1 = (calls[0]![1]!.headers as Record<string, string>)[CORRELATION_ID_HEADER];
-      const id2 = (calls[1]![1]!.headers as Record<string, string>)[CORRELATION_ID_HEADER];
+      const calls = fetchSpy.mock.calls as unknown as [string, RequestInit][];
+      const id1 = (calls[0]![1].headers as Record<string, string>)[CORRELATION_ID_HEADER];
+      const id2 = (calls[1]![1].headers as Record<string, string>)[CORRELATION_ID_HEADER];
 
       expect(id1).not.toBe(id2);
     });
@@ -69,8 +69,8 @@ describe('HttpClient integration', () => {
 
       await client.get('https://api.example.com/health');
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      const headers = init?.headers as Record<string, string>;
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      const headers = init.headers as Record<string, string>;
       expect(headers['X-App-Version']).toBe('1.0.0');
     });
   });

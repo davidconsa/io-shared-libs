@@ -148,8 +148,8 @@ describe('HttpClient', () => {
 
       await client.post('https://api.example.com/users', { name: 'Bob' });
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      expect(init?.body).toBe(JSON.stringify({ name: 'Bob' }));
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(init.body).toBe(JSON.stringify({ name: 'Bob' }));
     });
 
     it('should send string body as-is', async () => {
@@ -157,8 +157,8 @@ describe('HttpClient', () => {
 
       await client.post('https://api.example.com/raw', 'plain text body');
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      expect(init?.body).toBe('plain text body');
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(init.body).toBe('plain text body');
     });
   });
 
@@ -168,9 +168,9 @@ describe('HttpClient', () => {
 
       await client.put('https://api.example.com/users/1', { name: 'Eve' });
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      expect(init?.method).toBe('PUT');
-      expect(init?.body).toBe(JSON.stringify({ name: 'Eve' }));
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(init.method).toBe('PUT');
+      expect(init.body).toBe(JSON.stringify({ name: 'Eve' }));
     });
   });
 
@@ -180,8 +180,8 @@ describe('HttpClient', () => {
 
       await client.patch('https://api.example.com/users/1', { active: false });
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      expect(init?.method).toBe('PATCH');
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(init.method).toBe('PATCH');
     });
   });
 
@@ -191,8 +191,8 @@ describe('HttpClient', () => {
 
       await client.delete('https://api.example.com/users/1');
 
-      const [, init] = fetchSpy.mock.calls[0]!;
-      expect(init?.method).toBe('DELETE');
+      const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
+      expect(init.method).toBe('DELETE');
     });
   });
 

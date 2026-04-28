@@ -22,9 +22,9 @@ describe('buildInterceptorChain', () => {
       const callOrder: string[] = [];
       const mockInterceptor = mock<HttpInterceptor>();
 
-      const execute = jest.fn().mockImplementation(async () => {
+      const execute = jest.fn().mockImplementation(() => {
         callOrder.push('execute');
-        return mockUserResponse;
+        return Promise.resolve(mockUserResponse);
       });
 
       mockInterceptor.intercept.mockImplementation(
@@ -53,9 +53,9 @@ describe('buildInterceptorChain', () => {
       const mockInterceptorA = mock<HttpInterceptor>();
       const mockInterceptorB = mock<HttpInterceptor>();
 
-      const execute = jest.fn().mockImplementation(async () => {
+      const execute = jest.fn().mockImplementation(() => {
         callOrder.push('execute');
-        return mockUserResponse;
+        return Promise.resolve(mockUserResponse);
       });
 
       mockInterceptorA.intercept.mockImplementation(

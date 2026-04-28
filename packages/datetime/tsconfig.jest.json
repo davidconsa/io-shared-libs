@@ -1,0 +1,10 @@
+{
+  "extends": "../../packages/shared-configs/tsconfig/jest.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "lib": ["ES2022", "DOM"],
+    "types": ["jest"]
+  },
+  "include": ["src", "test"]
+}

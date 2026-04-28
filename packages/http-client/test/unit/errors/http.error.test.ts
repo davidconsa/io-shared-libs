@@ -1,5 +1,5 @@
-import { HttpError } from '../../../src/errors/http.error';
-import { HttpClientError } from '../../../src/errors/http-client.error';
+import {  } from 'jest-mock-extended';
+import { HttpClientError, HttpError } from '../../../src';
 import { buildMockMetadata } from '../../fixtures/mock-data';
 
 describe('HttpError', () => {
@@ -7,7 +7,7 @@ describe('HttpError', () => {
 
   describe('constructor', () => {
     it('should set all properties correctly', () => {
-      const responseBody = { error: 'NOT_FOUND' };
+      const responseBody = {error: 'NOT_FOUND'};
       const error = new HttpError('Not Found', 404, metadata, responseBody);
 
       expect(error.message).toBe('Not Found');
